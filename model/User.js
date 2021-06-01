@@ -23,6 +23,6 @@ const user_model = mongoose.Schema({
   token_exp: Number,
 });
 
-const user = mongoose.model("user", user_model);
+const User = mongoose.model("user", user_model);
 
-module.exports = { user };
+module.exports = { User };
