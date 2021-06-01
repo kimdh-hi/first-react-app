@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
+// Connect to MongoDB.
 const mongoose = require("mongoose");
 mongoose
   .connect(
@@ -13,8 +14,8 @@ mongoose
       useFindAndModify: false,
     }
   )
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
+  .then(() => console.log("MongoDB connected")) // success message
+  .catch(err => console.log(err)); // error message
 
 app.get("/", (req, res) => res.send("Hello World!!"));
 
