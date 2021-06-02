@@ -3,6 +3,7 @@ const app = express();
 const port = 3000;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const { auth } = require("./middleware/auth");
 
 const config = require("./config/key");
 const { User } = require("./model/User");
@@ -26,7 +27,7 @@ app.use(bodyParser.json()); // application/json 타입
 app.get("/", (req, res) => res.send("Hello World!!"));
 
 // 회원가입
-app.post("/register", (req, res) => {
+app.post("/api/users/register", (req, res) => {
   const user = new User(req.body);
 
   // Bcrypt 암호화
@@ -37,7 +38,7 @@ app.post("/register", (req, res) => {
 });
 
 // 로그인
-app.post("/login", (req, res) => {
+app.post("/api/users/login", (req, res) => {
   console.log("login...........");
   // 데이터베이스에서 로그인 요청된 이메일 있는지 조회
   User.findOne({ email: req.body.email }, (err, user) => {
@@ -64,6 +65,30 @@ app.post("/login", (req, res) => {
           userId: user._id,
         });
       });
+    });
+  });
+});
+
+/*
+  auth: 미들웨어
+*/
+app.get("/api/users/auth", auth, (req, res) => {
+  res.status(200).json({
+    _id: req.user._id,
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    role: req.user.role,
+    image: req.user.image,
+  });
+});
+
+app.get("/api/users/logout", auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, user) => {
+    if (err) return res.json({ success: false, err });
+    return res.status(200).send({
+      success: true,
     });
   });
 });

@@ -65,6 +65,19 @@ user_model.methods.generateToken = function (cb) {
   });
 };
 
+user_model.statics.findByToken = function (token, cb) {
+  var user = this;
+
+  // jwt토큰 복호화
+  // verify(암호화된 토큰, 'key', cb)
+  jwt.verify(token, "user_secret", function (err, decoded) {
+    user.findOne({ _id: decoded, token: token }, function (err, user) {
+      if (err) return cb(err);
+      cb(null, user);
+    });
+  });
+};
+
 const User = mongoose.model("user", user_model);
 
 module.exports = { User };
