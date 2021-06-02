@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 const config = require("./config/key");
 const { User } = require("./model/User");
@@ -27,9 +28,43 @@ app.get("/", (req, res) => res.send("Hello World!!"));
 // 회원가입
 app.post("/register", (req, res) => {
   const user = new User(req.body);
-  user.save((err, doc) => {
+
+  // Bcrypt 암호화
+  user.save((err, userInfo) => {
     if (err) return res.json({ success: false, err });
     return res.status(201).json({ success: true });
+  });
+});
+
+// 로그인
+app.post("/login", (req, res) => {
+  console.log("login...........");
+  // 데이터베이스에서 로그인 요청된 이메일 있는지 조회
+  User.findOne({ email: req.body.email }, (err, user) => {
+    if (!user) {
+      return res.json({
+        loginSuccess: false,
+        message: "Not exist email",
+      });
+    }
+    // 이메일이 조회되었다면 비밀번호를 확인
+    user.comparePassword(req.body.password, (err, isMatch) => {
+      if (!isMatch) {
+        return res.json({
+          loginSuccess: false,
+          message: "Wrong password",
+        });
+      }
+      user.generateToken((err, user) => {
+        if (err) return res.status(400).send(err);
+
+        // save token (cookie, local storage)
+        res.cookie("x_auth", user.token).status(200).json({
+          loginSuccess: true,
+          userId: user._id,
+        });
+      });
+    });
   });
 });
 
