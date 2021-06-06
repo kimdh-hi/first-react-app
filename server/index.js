@@ -21,7 +21,7 @@ mongoose
 // body-parser option setting
 app.use(bodyParser.urlencoded({ extended: true })); // application/x-www-form-urlencoded 타입
 app.use(bodyParser.json()); // application/json 타입
-
+app.use(cookieParser());
 app.get("/", (req, res) => res.send("Hello World!!"));
 
 // 회원가입
@@ -58,10 +58,10 @@ app.post("/api/users/login", (req, res) => {
         if (err) return res.status(400).send(err);
 
         // save token (cookie, local storage)
-        res.cookie("x_auth", user.token).status(200).json({
-          loginSuccess: true,
-          userId: user._id,
-        });
+        res
+          .cookie("x_auth", user.token)
+          .status(200)
+          .json({ loginSuccess: true, userId: user._id });
       });
     });
   });
