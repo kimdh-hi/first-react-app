@@ -1,4 +1,5 @@
 const { User } = require("../model/User");
+const cookieParser = require("cookie-parser");
 
 /*
     1. 쿠키에세 토큰을 가져옴
@@ -8,9 +9,7 @@ const { User } = require("../model/User");
 */
 let auth = (req, res, next) => {
   // 1번 작업
-  console.log("*********" + req.cookies);
   let token = req.cookies.x_auth;
-  console.log(token);
 
   // 2번 작업
   User.findByToken(token, (err, user) => {

@@ -1,15 +1,21 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 
-function LandingPage() {
-  useEffect(() => {
-    axios.get("/api/test").then(response => console.log(response.data));
-  }, []);
-
+function LandingPage(props) {
+  const onLogoutHandler = () => {
+    axios.get("/api/users/logout").then(response => {
+      if (response.data.success) {
+        props.history.push("/login");
+      } else {
+        alert("error");
+      }
+    });
+  };
   return (
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
@@ -17,6 +23,8 @@ function LandingPage() {
       }}
     >
       <h2>Landing Page</h2>
+
+      <button onClick={onLogoutHandler}>Logout</button>
     </div>
   );
 }
